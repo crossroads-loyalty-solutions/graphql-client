@@ -6,19 +6,30 @@
 // eslint-disable-next-line no-unused-vars
 export type Query<P, R> = string;
 
+type DError = Error & {
+  httpBody?: string | {},
+};
+
+type QueryBody = {
+  query: string,
+  variables: { [key: string]: mixed },
+};
+
+/**
+ * A GraphQL error.
+ */
+export type GraphQLError = {
+  message: string,
+};
+
 export type GraphQLResponse<T> = {
-  errors?: mixed,
-  data: ?T,
+  errors?: Array<GraphQLError>,
+  data?: T,
 };
 
 export type Fetch = (input: string | Request, init?: RequestOptions) => Promise<Response>;
 
-type GraphQLRequest = {
-  query: string,
-  variables: {},
-};
-
-type Options = {
+export type Options = {
   endpoint: string,
   debounce?: number,
 };
@@ -26,13 +37,15 @@ type Options = {
 type Pending<P, R> = {
   query: Query<P, R>,
   variables: P,
-  resolve: (t: R) => void,
+  resolve: (t: GraphQLResponse<R>) => void,
   reject: (e: any) => void,
 };
 
-function jsonResponse<T>(resp: Response): Promise<T> {
-  return resp.json();
-}
+const jsonResponse = <T>(resp: Response): Promise<T> =>
+  resp.json();
+
+const extractQuery = ({ query, variables }: Pending<any, any>): QueryBody =>
+  ({ query, variables });
 
 export class GraphQLClient {
   fetch: Fetch;
@@ -50,15 +63,15 @@ export class GraphQLClient {
     this.endpoint = endpoint;
     this.debounce = debounce;
     this.fetch = fetch;
-    this.queue = new Promise((resolve: () => void): void => resolve());
+    this.queue = new Promise((resolve: (val: void) => void): void => resolve(undefined));
   }
 
   // TODO: Support for immediate queue
-  query<P, R>(query: Query<P, R>, variables: P): Promise<R> {
-    return new Promise(
-      (resolve: (r: R) => void, reject: (err: mixed) => void): void =>
-        this.enqueue({ query, variables, resolve, reject })
-    );
+  query<P, R>(query: Query<P, R>, variables: P): Promise<GraphQLResponse<R>> {
+    return new Promise((
+      resolve: (response: GraphQLResponse<R>) => void,
+      reject: (error: GraphQLError) => void
+    ): void => this.enqueue({ query, variables, resolve, reject }));
   }
 
   enqueue<P, R>(pending: Pending<P, R>): void {
@@ -67,7 +80,7 @@ export class GraphQLClient {
     // TODO: Queue on promise instead, but have a timer to debounce
     // TODO: Use a debounce or throttle?
     if (!this.timer) {
-      this.timer = setTimeout(this.fire.bind(this), this.debounce);
+      this.timer = setTimeout((): void => this.fire(), this.debounce);
     }
   }
 
@@ -88,9 +101,7 @@ export class GraphQLClient {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(pending.map(
-        ({ query, variables }: Pending<any, any>): GraphQLRequest => ({ query, variables })
-      )),
+      body: JSON.stringify(pending.map(extractQuery)),
     };
 
     const onResponse = (response: Array<GraphQLResponse<any>>): void => {
@@ -103,10 +114,9 @@ export class GraphQLClient {
           if (!r.data) {
             pending[i].reject(r.errors);
 
-            // TODO: Better typed error
-            const error = new Error("GraphQL Request Error");
+            const error: DError = new Error("GraphQL Request Error");
 
-            (error: any).httpBody = JSON.stringify(r.errors, null, 2);
+            error.httpBody = JSON.stringify(r.errors, null, 2);
 
             while (this.waiting.length > 0) {
               this.waiting.pop().reject(error);
@@ -150,7 +160,7 @@ export class GraphQLClient {
   }
 
   waitForRequests(): Promise<void> {
-    return new Promise((resolve: (r: any) => void, reject: (e: Error) => void): void => {
+    return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
       if (this.hasPromisesRemaining()) {
         this.waiting.push({ resolve, reject });
       }
