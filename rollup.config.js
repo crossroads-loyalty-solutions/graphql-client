@@ -1,15 +1,17 @@
+/* @flow */
+
 import babel from "rollup-plugin-babel";
 
 export default {
   input: "src/index.js",
   output: [
     {
-      file:  "dist/index.js",
+      file: "dist/index.js",
       format: "cjs",
       sourcemap: true,
     },
     {
-      file:  "dist/index.esm.js",
+      file: "dist/index.esm.js",
       format: "esm",
       sourcemap: true,
     },
@@ -28,12 +30,13 @@ export default {
             firefox: 50,
             ie: 11,
           },
-          exclude: [ "transform-typeof-symbol" ],
+          exclude: ["transform-typeof-symbol"],
         }],
       ],
       plugins: [
-        // We cannot use the preset since this must go before class-properties to avoid
-        // emitting `this.propertyName = void 0;` for typed class properties
+        // We cannot use the preset since this must go before class-properties
+        // to avoid emitting `this.propertyName = void 0;` for typed class
+        // properties
         ["@babel/plugin-transform-flow-strip-types"],
         // Loose mode for smaller and faster code
         ["@babel/plugin-proposal-class-properties", { loose: true }],

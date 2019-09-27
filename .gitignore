@@ -2,8 +2,9 @@
 *.map
 .DS_Store
 .vscode
+/.nyc_output
+/coverage
 /*.tgz
-dist
-target
-node_modules
-package-lock.json
+/dist
+/node_modules
+/package-lock.json
