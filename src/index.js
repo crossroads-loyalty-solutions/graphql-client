@@ -1,52 +1,16 @@
 /* @flow */
 
-/**
- * Query type with parameters and return type as phantom types.
- */
-// eslint-disable-next-line no-unused-vars
-export type Query<P, R> = string;
+export type {
+  Fetch,
+  GraphQLResult,
+  GraphQLError,
+} from "./types";
 
-type DError = Error & {
-  httpBody?: string | {},
-};
+export { createClient as createFetchClient } from "./fetch";
+export { createClient as createBatchedClient } from "./batched";
+export { createCachedClient } from "./cache";
 
-type QueryBody = {
-  query: string,
-  variables: { [key: string]: mixed },
-};
-
-/**
- * A GraphQL error.
- */
-export type GraphQLError = {
-  message: string,
-};
-
-export type GraphQLResponse<T> = {
-  errors?: Array<GraphQLError>,
-  data?: T,
-};
-
-export type Fetch = (input: string | Request, init?: RequestOptions) => Promise<Response>;
-
-export type Options = {
-  endpoint: string,
-  debounce?: number,
-};
-
-type Pending<P, R> = {
-  query: Query<P, R>,
-  variables: P,
-  resolve: (t: GraphQLResponse<R>) => void,
-  reject: (e: any) => void,
-};
-
-const jsonResponse = <T>(resp: Response): Promise<T> =>
-  resp.json();
-
-const extractQuery = ({ query, variables }: Pending<any, any>): QueryBody =>
-  ({ query, variables });
-
+/*
 export class GraphQLClient {
   fetch: Fetch;
   endpoint: string;
@@ -57,21 +21,18 @@ export class GraphQLClient {
   inflights: number = 0;
   waiting: Array<{ resolve: () => void, reject: (error: any) => void }> = [];
 
-  constructor(fetch: Fetch, options: Options): void {
+  constructor(fetch: Fetch, options: Options) {
     const { endpoint, debounce = 5 } = options;
 
     this.endpoint = endpoint;
     this.debounce = debounce;
     this.fetch = fetch;
-    this.queue = new Promise((resolve: (val: void) => void): void => resolve(undefined));
+    this.queue = new Promise(resolve => resolve(undefined));
   }
 
   // TODO: Support for immediate queue
-  query<P, R>(query: Query<P, R>, variables: P): Promise<GraphQLResponse<R>> {
-    return new Promise((
-      resolve: (response: GraphQLResponse<R>) => void,
-      reject: (error: GraphQLError) => void
-    ): void => this.enqueue({ query, variables, resolve, reject }));
+  query<P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResponse<R>> {
+    return new Promise((resolve, reject) => this.enqueue({ query, variables, resolve, reject }));
   }
 
   enqueue<P, R>(pending: Pending<P, R>): void {
@@ -80,7 +41,7 @@ export class GraphQLClient {
     // TODO: Queue on promise instead, but have a timer to debounce
     // TODO: Use a debounce or throttle?
     if (!this.timer) {
-      this.timer = setTimeout((): void => this.fire(), this.debounce);
+      this.timer = setTimeout(() => this.fire(), this.debounce);
     }
   }
 
@@ -90,8 +51,8 @@ export class GraphQLClient {
 
     this.inflights += 1;
     this.queue = this.queue
-      .then(this.runRequests.bind(this))
-      .then(this.onRequestsFinished.bind(this));
+      .then(() => this.runRequests())
+      .then(() => this.onRequestsFinished());
   }
 
   runRequests(): Promise<void> {
@@ -101,11 +62,11 @@ export class GraphQLClient {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(pending.map(extractQuery)),
+      body: JSON.stringify(pending.map(({ query, variables }) => ({ query, variables }))),
     };
 
-    const onResponse = (response: Array<GraphQLResponse<any>>): void => {
-      response.forEach((r: GraphQLResponse<any>, i: number): void => {
+    const onResponse = (response: Array<MaybeGraphQLResponse<any>>) => {
+      response.forEach((r, i) => {
         if (r.errors) {
           if (process.env.NODE_ENV !== "production") {
             console.error("Got GraphQL error:", r.errors);
@@ -130,9 +91,9 @@ export class GraphQLClient {
       });
     };
 
-    const onError = (error: Error): void => {
+    const onError = error => {
       // TODO: Check if it is a http body
-      pending.forEach(({ reject }: Pending<any, any>): void => reject(error));
+      pending.forEach(({ reject }) => reject(error));
 
       while (this.waiting.length > 0) {
         this.waiting.pop().reject(error);
@@ -142,6 +103,8 @@ export class GraphQLClient {
     clearTimeout(this.timer);
     this.timer = null;
     this.pending = [];
+
+    // console.log(`Sending ${pending.length} queries`);
 
     return fetch(endpoint, init).then(jsonResponse).then(onResponse, onError);
   }
@@ -160,7 +123,7 @@ export class GraphQLClient {
   }
 
   waitForRequests(): Promise<void> {
-    return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+    return new Promise((resolve, reject) => {
       if (this.hasPromisesRemaining()) {
         this.waiting.push({ resolve, reject });
       }
@@ -174,3 +137,4 @@ export class GraphQLClient {
     return this.inflights + this.pending.length > 0;
   }
 }
+*/
