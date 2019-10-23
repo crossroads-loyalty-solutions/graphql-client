@@ -2,22 +2,17 @@
 
 import type {
   Client,
-  Fetch,
   GraphQLError,
   GraphQLResponse,
   GraphQLResult,
   Query,
-  Reject,
-  Resolve,
-} from "./types";
+} from "./graphql";
+import type { Fetch } from "./fetch";
+import type { Reject, Resolve } from "./promise";
 
 import { queryError } from "./error";
-import {
-  createInit,
-  createPromiseTracker,
-  handleResponse,
-  resolved,
-} from "./util";
+import { createPromiseTracker, resolved } from "./promise";
+import { createInit, handleResponse } from "./graphql";
 
 export type Options = {
   fetch: Fetch,
@@ -64,11 +59,11 @@ export const createClient = ({
             return;
           }
 
-          // TODO: How do we handle errors here?
+          // TODO: How do we handle errors here? Can we ensure we propagate when we reject?
 
           req.resolve(res);
         }),
-      // Propagate to the errors
+      // Propagate to the errors to all promises
       (e: any): void => requests.forEach(({ reject }: Pending<any, any>): void => reject(e)));
 
   const fire = (): void => {
@@ -85,7 +80,7 @@ export const createClient = ({
     });
   };
 
-  // TODO: Add possibility to skip the batching?
+  // TODO: Add option to skip the batching?
   const query = <P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResult<R>> => {
     const p = new Promise((resolve: Resolve<GraphQLResult<R>>, reject: Reject): void => {
       if (!timer) {

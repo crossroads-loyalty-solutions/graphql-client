@@ -2,16 +2,18 @@
 
 import type {
   Client,
-  Fetch,
   GraphQLResult,
   Query,
-} from "./types";
+} from "./graphql";
 
 import {
   createInit,
-  createPromiseTracker,
   handleResponse,
-} from "./util";
+} from "./graphql";
+
+import { createPromiseTracker } from "./promise";
+
+export type Fetch = (input: string, init: RequestOptions) => Promise<Response>;
 
 export type Options = {
   fetch: Fetch,

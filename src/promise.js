@@ -1,11 +1,8 @@
 /* @flow */
 
-import type { GraphQLRequestBody, Resolve } from "./types";
+export type Resolve<T> = (t: Promise<T> | T) => void;
 
-import {
-  requestError,
-  parseError,
-} from "./error";
+export type Reject = (e: any) => void;
 
 export type PromiseTracker = {
   add: (req: Promise<any>) => void,
@@ -15,32 +12,6 @@ export type PromiseTracker = {
 
 export const resolved: Promise<void> =
   new Promise((resolve: Resolve<void>): void => resolve(undefined));
-
-export const createInit = (
-  request: GraphQLRequestBody | Array<GraphQLRequestBody>
-): RequestOptions =>
-  ({
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  });
-
-export const handleResponse = <R>(res: Response): Promise<R> =>
-  res.text().then((bodyText: string): R => {
-    if (!res.ok) {
-      throw requestError(res, bodyText, `Received status code {res.status}.`);
-    }
-
-    try {
-      // Since it is successful we assume we have GraphQL-data
-      return JSON.parse(bodyText);
-    }
-    catch (e) {
-      throw parseError(res, bodyText, e);
-    }
-  });
 
 export const createPromiseTracker = (): PromiseTracker => {
   const inflight = [];

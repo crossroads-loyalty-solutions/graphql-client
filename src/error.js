@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { GraphQLError } from "./types";
+import type { GraphQLError } from "./graphql";
 
 export type RequestError = Error & {
   name: "RequestError",

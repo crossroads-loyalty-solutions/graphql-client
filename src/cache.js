@@ -1,7 +1,6 @@
 /* @flow */
 
-import type { Client } from "./client";
-import type { GraphQLRequestBody, GraphQLResult, Query } from "./types";
+import type { Client, GraphQLRequestBody, GraphQLResult, Query } from "./graphql";
 
 export type Cache<K, V> = {
   get: (k: K) => ?V,
@@ -89,7 +88,7 @@ export const createCachedClient = <O: {}>(
   const query = <P, R: {}>(
     query: Query<P, R>,
     variables: P,
-    options: O & { cache?: boolean }
+    options?: O & { cache?: boolean }
   ): Promise<GraphQLResult<R>> => {
     const req = get({ query, variables });
 
