@@ -17,8 +17,8 @@ export const createPromiseTracker = (): PromiseTracker => {
   const inflight = [];
   let waiting = [];
 
-  // TODO: How to manage errors?
   const done = (): void => {
+    // Resolve-functions, will all be queued on the run-loop
     for (const i of waiting) {
       i();
     }
@@ -40,7 +40,6 @@ export const createPromiseTracker = (): PromiseTracker => {
     };
 
     inflight.push(req);
-    // TODO: How to manage errors?
     req.then(drop, drop);
   };
 
