@@ -10,9 +10,8 @@ import type {
 import type { Fetch } from "./fetch";
 import type { Reject, Resolve } from "./promise";
 
-import { queryError } from "./error";
 import { createPromiseTracker, resolved } from "./promise";
-import { createInit, handleResponse } from "./graphql";
+import { createInit, handleResponse, rejectErrorResponses } from "./graphql";
 
 export type Options = {
   fetch: Fetch,
@@ -24,7 +23,7 @@ export type Options = {
 type Pending<P, R> = {
   query: Query<P, R>,
   variables: P,
-  resolve: (t: GraphQLResult<R>) => void,
+  resolve: (t: GraphQLResponse<R>) => void,
   reject: (e: Error) => void,
 };
 
@@ -47,24 +46,14 @@ export const createClient = ({
   const runRequests = (requests: Array<Pending<any, any>>): Promise<void> =>
     fetch(endpoint, createInit(requests.map(extractQueryVariables)))
       .then(handleResponse)
-      .then((response: Array<GraphQLResponse<any>>): void =>
-        requests.forEach(<P, R: {}>(req: Pending<P, R>, i: number): void => {
-          const res: GraphQLResponse<R> = response[i];
-
-          if (!res.data) {
-            const error = queryError(res.errors);
-
-            req.reject(error);
-
-            return;
-          }
-
-          // TODO: How do we handle errors here? Can we ensure we propagate when we reject?
-
-          req.resolve(res);
-        }),
-      // Propagate to the errors to all promises
-      (e: any): void => requests.forEach(({ reject }: Pending<any, any>): void => reject(e)));
+      .then(
+        // Group up the responses with their request promise
+        (response: Array<GraphQLResponse<any>>): void =>
+          requests.forEach(<P, R: {}>(req: Pending<P, R>, i: number): void =>
+            req.resolve(response[i])),
+        // Propagate to the errors to all promises
+        (e: any): void => requests.forEach((req: Pending<any, any>): void =>
+          req.reject(e)));
 
   const fire = (): void => {
     // We wait with clearing the timer until we have actually fired off the
@@ -82,7 +71,7 @@ export const createClient = ({
 
   // TODO: Add option to skip the batching?
   const query = <P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResult<R>> => {
-    const p = new Promise((resolve: Resolve<GraphQLResult<R>>, reject: Reject): void => {
+    const p = (new Promise((resolve: Resolve<GraphQLResponse<R>>, reject: Reject): void => {
       if (!timer) {
         timer = setTimeout(fire, debounceTime);
       }
@@ -93,7 +82,7 @@ export const createClient = ({
         resolve,
         reject,
       });
-    });
+    })).then(rejectErrorResponses);
 
     add(p);
 

@@ -1,9 +1,6 @@
 /* @flow */
 
-import {
-  requestError,
-  parseError,
-} from "./error";
+import { parseError, queryError, requestError } from "./error";
 
 /**
  * A GraphQLClient with the possible options O.
@@ -73,3 +70,14 @@ export const handleResponse = <R>(res: Response): Promise<R> =>
       throw parseError(res, bodyText, e);
     }
   });
+
+/**
+ * Rejects any responses without any data, ie. they only contain errors.
+ */
+export const rejectErrorResponses = <R: {}>(res: GraphQLResponse<R>): GraphQLResult<R> => {
+  if (!res.data) {
+    throw queryError(res.errors);
+  }
+
+  return res;
+};
