@@ -6,11 +6,7 @@ import type {
   Query,
 } from "./graphql";
 
-import {
-  createInit,
-  handleResponse,
-} from "./graphql";
-
+import { createInit, handleResponse, rejectErrorResponses } from "./graphql";
 import { createPromiseTracker } from "./promise";
 
 export type Fetch = (input: string, init: RequestOptions) => Promise<Response>;
@@ -25,7 +21,8 @@ export const createClient = ({ endpoint, fetch }: Options): Client<{}> => {
 
   const query = <P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResult<R>> => {
     const req = fetch(endpoint, createInit({ query, variables }))
-      .then(handleResponse);
+      .then(handleResponse)
+      .then(rejectErrorResponses);
 
     add(req);
 
