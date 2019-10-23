@@ -90,6 +90,10 @@ export const createCachedClient = <O: {}>(
     variables: P,
     options?: O & { cache?: boolean }
   ): Promise<GraphQLResult<R>> => {
+    if (options && !options.cache) {
+      return parentQuery(query, variables, options);
+    }
+
     const req = get({ query, variables });
 
     if (req) {
