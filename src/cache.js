@@ -77,6 +77,9 @@ export const createCache = <K, V>(size: number): Cache<K, V> => {
   };
 };
 
+/**
+ * Creates an opt-in LRU-cache for all queries.
+ */
 export const createCachedClient = <O: {}>(
   client: Client<O>,
   { size: cacheSize = 10 }: CachedClientOptions
@@ -90,7 +93,7 @@ export const createCachedClient = <O: {}>(
     variables: P,
     options?: O & { cache?: boolean }
   ): Promise<GraphQLResult<R>> => {
-    if (options && !options.cache) {
+    if (!options || !options.cache) {
       return parentQuery(query, variables, options);
     }
 
