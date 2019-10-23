@@ -62,7 +62,7 @@ export const createInit = (
 export const handleResponse = <R>(res: Response): Promise<R> =>
   res.text().then((bodyText: string): R => {
     if (!res.ok) {
-      throw requestError(res, bodyText, `Received status code {res.status}.`);
+      throw requestError(res, bodyText, `Received status code ${res.status}`);
     }
 
     try {
