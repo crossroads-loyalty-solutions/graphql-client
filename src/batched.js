@@ -51,8 +51,8 @@ export const createClient = ({
           requests.forEach(<P, R: {}>(req: Pending<P, R>, i: number): void =>
             req.resolve(response[i])),
         // Propagate to the errors to all promises
-        (e: any): void => requests.forEach((req: Pending<any, any>): void =>
-          req.reject(e)));
+        (e: any): void =>
+          requests.forEach((req: Pending<any, any>): void => req.reject(e)));
 
   const fire = (): void => {
     // We wait with clearing the timer until we have actually fired off the
