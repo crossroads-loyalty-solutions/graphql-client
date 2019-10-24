@@ -35,7 +35,7 @@ export const createClient = ({
   fetch,
   endpoint,
   debounceTime = 5,
-}: Options): Client<{ rejectAnyError: boolean }> => {
+}: Options): Client<{ rejectAnyError?: boolean }> => {
   const { wait, add, size } = createPromiseTracker();
 
   let timer: ?TimeoutID = null;
@@ -71,7 +71,7 @@ export const createClient = ({
   const query = <P, R: {}>(
     query: Query<P, R>,
     variables: P,
-    { rejectAnyError = false }: { rejectAnyError: boolean } = {}
+    { rejectAnyError = false }: { rejectAnyError?: boolean } = {}
   ): Promise<GraphQLResult<R>> => {
     const p = (new Promise((resolve: Resolve<GraphQLResponse<R>>, reject: Reject): void => {
       if (!timer) {
