@@ -12,7 +12,7 @@
   "scripts": {
     "build": "npm-run-all build:*",
     "build:rollup": "rollup -c rollup.config.js",
-    "build:flow": "cp build/flowstub.js dist/index.esm.js.flow",
+    "build:flow": "cp build/flowstub.js dist/index.esm.js.flow && cp build/flowstub.js dist/index.js.flow",
     "clean": "rm -rf dist",
     "coverage": "nyc --reporter=html ava --verbose",
     "distclean": "rm -rf package-lock.json node_modules dist",
