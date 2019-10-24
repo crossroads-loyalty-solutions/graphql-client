@@ -39,7 +39,7 @@ export const createFetchStub = (t: TestInterface<Ninos>, responses: Array<MockRe
 
     return Promise.resolve({
       ...resp,
-      text: () => Promise.resolve(JSON.stringify(text)),
+      text: () => Promise.resolve(text),
     });
   });
 };
