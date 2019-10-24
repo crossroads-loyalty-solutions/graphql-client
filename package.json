@@ -2,6 +2,10 @@
   "name": "@crossroads-loyalty-solutions/graphql-client",
   "version": "0.0.1",
   "description": "A more capable client for basic queries",
+  "authors": [
+    "Martin Wernstål <m4rw3r@gmail.com>"
+  ],
+  "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
   "scripts": {
@@ -21,11 +25,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://groot.crossroads.se/node_modules/graphql-client.git"
+    "url": "https://github.com/crossroads-loyalty-solutions/graphql-client.git"
   },
-  "authors": [
-    "Martin Wernstål <m4rw3r@gmail.com>"
-  ],
+  "bugs": "https://github.com/crossroads-loyalty-solutions/graphql-client/issues",
+  "homepage": "https://github.com/crossroads-loyalty-solutions/graphql-client",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "7.6.2",
@@ -46,6 +49,9 @@
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-replace": "2.2.0",
     "xo": "0.25.3"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "xo": {
     "extends": [
