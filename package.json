@@ -7,7 +7,7 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/index.ems.js",
+  "module": "dist/index.esm.js",
   "sideEffects": false,
   "scripts": {
     "build": "npm-run-all build:*",
