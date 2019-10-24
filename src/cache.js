@@ -80,9 +80,9 @@ export const createCache = <K, V>(size: number): Cache<K, V> => {
 /**
  * Creates an opt-in LRU-cache for all queries.
  */
-export const createCachedClient = <O: {}>(
+export const createClient = <O: {}>(
   client: Client<O>,
-  { size: cacheSize = 10 }: CachedClientOptions
+  { size: cacheSize = 10 }: CachedClientOptions = {}
 ): Client<O & { cache?: boolean }> => {
   const { query: parentQuery, wait, size } = client;
   const { dropValue, get, set } =

@@ -3,8 +3,7 @@
 import ava from "ava";
 import ninos from "ninos";
 
-import { createCache } from "../src/cache";
-// import { createFetchStub } from "./util";
+import { createCache, createClient } from "../src/cache";
 
 const test = ninos(ava);
 

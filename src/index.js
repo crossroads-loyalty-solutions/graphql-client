@@ -5,4 +5,4 @@ export type { Fetch } from "./fetch";
 
 export { createClient as createFetchClient } from "./fetch";
 export { createClient as createBatchedClient } from "./batched";
-export { createCachedClient } from "./cache";
+export { createClient as createCachedClient } from "./cache";
