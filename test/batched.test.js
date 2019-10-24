@@ -15,6 +15,11 @@ test("single", async t => {
       status: 200,
       text: JSON.stringify([{ data: { foo: "bar" } }]),
     },
+    {
+      ok: true,
+      status: 200,
+      text: JSON.stringify([{ data: { another: "bar" } }]),
+    },
   ]);
   const client = createClient({
     fetch,
@@ -37,6 +42,20 @@ test("single", async t => {
   t.is(fetch.calls.length, 1);
   t.deepEqual(fetch.calls[0].arguments, ["foo", {
     body: `[{"query":"foobar","variables":{"lol":"baz"}}]`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  }]);
+
+  t.deepEqual(
+    await client.query("foo", null, { rejectAnyError: true }),
+    { data: { another: "bar" } }
+  );
+
+  t.is(fetch.calls.length, 2);
+  t.deepEqual(fetch.calls[1].arguments, ["foo", {
+    body: `[{"query":"foo","variables":null}]`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -130,6 +149,41 @@ test("batching with one error", async t => {
     },
     method: "POST",
   }]);
+});
+
+test("partial data", async t => {
+  const fetch = createFetchStub(t, [
+    {
+      ok: true,
+      status: 200,
+      text: JSON.stringify([
+        { errors: [{ message: "An error" }], data: { some: "data" } },
+      ]),
+    },
+    {
+      ok: true,
+      status: 200,
+      text: JSON.stringify([
+        { errors: [{ message: "Another error" }], data: { some: "yes" } },
+      ]),
+    },
+  ]);
+  const client = createClient({
+    fetch,
+    endpoint: "foo",
+  });
+
+  t.deepEqual(await client.query("foo"), { errors: [{ message: "An error" }], data: { some: "data" } });
+
+  try {
+    await client.query("foo", null, { rejectAnyError: true });
+  }
+  catch (e) {
+    t.true(e instanceof Error);
+    t.is(e.name, "QueryError");
+    t.is(String(e), "QueryError: Another error");
+    t.deepEqual(e.errors, [{ message: "Another error" }]);
+  }
 });
 
 test("errors", async t => {

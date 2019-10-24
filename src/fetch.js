@@ -7,7 +7,7 @@ import type {
 } from "./graphql";
 
 import { parseError, requestError } from "./error";
-import { createInit, rejectErrorResponses } from "./graphql";
+import { createInit, rejectAnyErrorResponse, rejectErrorResponse } from "./graphql";
 import { createPromiseTracker } from "./promise";
 
 export type Fetch = (input: string, init: RequestOptions) => Promise<Response>;
@@ -35,13 +35,19 @@ export const handleResponse = <R>(res: Response): Promise<R> =>
     }
   });
 
-export const createClient = ({ endpoint, fetch }: Options): Client<{}> => {
+export const createClient = (
+  { endpoint, fetch }: Options
+): Client<{ rejectAnyError: boolean }> => {
   const { add, size, wait } = createPromiseTracker();
 
-  const query = <P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResult<R>> => {
+  const query = <P, R: {}>(
+    query: Query<P, R>,
+    variables: P,
+    { rejectAnyError = false }: { rejectAnyError: boolean } = {}
+  ): Promise<GraphQLResult<R>> => {
     const req = fetch(endpoint, createInit({ query, variables }))
       .then(handleResponse)
-      .then(rejectErrorResponses);
+      .then(rejectAnyError ? rejectAnyErrorResponse : rejectErrorResponse);
 
     add(req);
 

@@ -2,7 +2,6 @@
 
 import type {
   Client,
-  GraphQLError,
   GraphQLResponse,
   GraphQLResult,
   Query,
@@ -11,13 +10,12 @@ import type { Fetch } from "./fetch";
 import type { Reject, Resolve } from "./promise";
 
 import { handleResponse } from "./fetch";
-import { createInit, rejectErrorResponses } from "./graphql";
+import { createInit, rejectAnyErrorResponse, rejectErrorResponse } from "./graphql";
 import { createPromiseTracker, resolved } from "./promise";
 
 export type Options = {
   fetch: Fetch,
   endpoint: string,
-  onErrors?: (e: Array<GraphQLError>) => void,
   debounceTime?: number,
 };
 
@@ -37,7 +35,7 @@ export const createClient = ({
   fetch,
   endpoint,
   debounceTime = 5,
-}: Options): Client<{}> => {
+}: Options): Client<{ rejectAnyError: boolean }> => {
   const { wait, add, size } = createPromiseTracker();
 
   let timer: ?TimeoutID = null;
@@ -70,8 +68,11 @@ export const createClient = ({
     });
   };
 
-  // TODO: Add option to skip the batching?
-  const query = <P, R: {}>(query: Query<P, R>, variables: P): Promise<GraphQLResult<R>> => {
+  const query = <P, R: {}>(
+    query: Query<P, R>,
+    variables: P,
+    { rejectAnyError = false }: { rejectAnyError: boolean } = {}
+  ): Promise<GraphQLResult<R>> => {
     const p = (new Promise((resolve: Resolve<GraphQLResponse<R>>, reject: Reject): void => {
       if (!timer) {
         timer = setTimeout(fire, debounceTime);
@@ -83,7 +84,8 @@ export const createClient = ({
         resolve,
         reject,
       });
-    })).then(rejectErrorResponses);
+    }))
+      .then(rejectAnyError ? rejectAnyErrorResponse : rejectErrorResponse);
 
     add(p);
 
