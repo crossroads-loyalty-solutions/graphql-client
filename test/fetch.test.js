@@ -184,7 +184,12 @@ test("client errors", async t => {
     {
       ok: false,
       status: 500,
-      text: Promise.reject(new Error("Failed to read")),
+      text: {
+        // Simulate Promise to avoid unhandled rejection since this promise
+        // will persist in a generator otherwise
+        then: (onResolved, onError) =>
+          setTimeout(() => onError(new Error("Failed to read")), 0),
+      },
     },
   ]);
 
