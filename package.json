@@ -8,6 +8,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
+  "sideEffects": false,
   "scripts": {
     "build": "npm-run-all build:*",
     "build:rollup": "rollup -c rollup.config.js",
