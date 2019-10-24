@@ -140,7 +140,7 @@ test("PromiseTracker throw", async t => {
   t.is(tracker.size(), 2);
   t.is(isResolved, false);
 
-  rejectB();
+  rejectB(new Error("b error"));
 
   try {
     await b;
