@@ -19,4 +19,7 @@ export default {
   plugins: [
     babel(require("./build/babel")),
   ],
+  external: [
+    "fast-deep-equal",
+  ],
 };
