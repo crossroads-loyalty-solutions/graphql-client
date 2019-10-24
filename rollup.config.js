@@ -1,7 +1,6 @@
 /* @flow */
 
 import babel from "rollup-plugin-babel";
-import babelConfig from "./build/babel";
 
 export default {
   input: "src/index.js",
@@ -18,6 +17,6 @@ export default {
     },
   ],
   plugins: [
-    babel(babelConfig),
+    babel(require("./build/babel")),
   ],
 };
