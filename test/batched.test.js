@@ -55,7 +55,7 @@ test("single", async t => {
 
   t.is(fetch.calls.length, 2);
   t.deepEqual(fetch.calls[1].arguments, ["foo", {
-    body: `[{"query":"foo","variables":null}]`,
+    body: `[{"query":"foo"}]`,
     headers: {
       "Content-Type": "application/json",
     },

@@ -45,7 +45,7 @@ export const createClient = (
     variables: P,
     { rejectAnyError = false }: { rejectAnyError: boolean } = {}
   ): Promise<GraphQLResult<R>> => {
-    const req = fetch(endpoint, createInit({ query, variables }))
+    const req = fetch(endpoint, createInit({ query, variables: variables || undefined }))
       .then(handleResponse)
       .then(rejectAnyError ? rejectAnyErrorResponse : rejectErrorResponse);
 

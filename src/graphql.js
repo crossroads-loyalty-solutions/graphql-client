@@ -26,7 +26,7 @@ export type GraphQLErrorResponse = {
 
 export type GraphQLRequestBody = {
   +query: string,
-  +variables: ?mixed,
+  +variables?: mixed,
 };
 
 export type GraphQLResponse<T: {}> = GraphQLResult<T> | GraphQLErrorResponse;

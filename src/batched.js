@@ -28,8 +28,8 @@ type Pending<P, R> = {
 
 const extractQueryVariables = <P>(
   { query, variables }: Pending<P, any>
-): { query: string, variables: P } =>
-    ({ query, variables });
+): { query: string, variables?: P } =>
+    ({ query, variables: variables || undefined });
 
 export const createClient = ({
   fetch,

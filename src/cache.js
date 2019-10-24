@@ -97,7 +97,8 @@ export const createCachedClient = <O: {}>(
       return parentQuery(query, variables, options);
     }
 
-    const req = get({ query, variables });
+    const key = { query, variables: variables || undefined };
+    const req = get(key);
 
     if (req) {
       return req;
@@ -105,7 +106,7 @@ export const createCachedClient = <O: {}>(
 
     const newReq = parentQuery(query, variables, options);
 
-    set({ query, variables }, newReq);
+    set(key, newReq);
 
     // In case it fails hard we want to remove it from the cache
     newReq.catch((): void => dropValue(newReq));
