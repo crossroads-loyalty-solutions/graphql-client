@@ -10,8 +10,9 @@ import type {
 import type { Fetch } from "./fetch";
 import type { Reject, Resolve } from "./promise";
 
+import { handleResponse } from "./fetch";
+import { createInit, rejectErrorResponses } from "./graphql";
 import { createPromiseTracker, resolved } from "./promise";
-import { createInit, handleResponse, rejectErrorResponses } from "./graphql";
 
 export type Options = {
   fetch: Fetch,

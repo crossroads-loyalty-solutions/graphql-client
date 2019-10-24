@@ -1,6 +1,6 @@
 /* @flow */
 
-import { parseError, queryError, requestError } from "./error";
+import { queryError } from "./error";
 
 /**
  * A GraphQLClient with the possible options O.
@@ -51,24 +51,6 @@ export const createInit = (
       "Content-Type": "application/json",
     },
     body: JSON.stringify(request),
-  });
-
-/**
- * Basic response-handling, throws if the result is not ok or fails to parse.
- */
-export const handleResponse = <R>(res: Response): Promise<R> =>
-  res.text().then((bodyText: string): R => {
-    if (!res.ok) {
-      throw requestError(res, bodyText, `Received status code ${res.status}`);
-    }
-
-    try {
-      // Since it is successful we assume we have GraphQL-data
-      return JSON.parse(bodyText);
-    }
-    catch (e) {
-      throw parseError(res, bodyText, e);
-    }
   });
 
 /**
