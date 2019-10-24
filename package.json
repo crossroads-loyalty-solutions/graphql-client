@@ -79,5 +79,8 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "fast-deep-equal": "^2.0.1"
   }
 }

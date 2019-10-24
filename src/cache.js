@@ -2,6 +2,8 @@
 
 import type { Client, GraphQLRequestBody, GraphQLResult, Query } from "./graphql";
 
+import deepEqual from "fast-deep-equal";
+
 export type Cache<K, V> = {
   get: (k: K) => ?V,
   set: (k: K, v: V) => void,
@@ -17,56 +19,59 @@ type CachedClientOptions = {
  * Creates a simple cache.
  */
 export const createCache = <K, V>(size: number): Cache<K, V> => {
-  // Use a map since it accepts all types of values as keys
-  const cache = new Map<K, V>();
+  // Use array since we have to compare keys using deep-equal
+  // Last element is the most recently used
+  const cache: Array<[K, V]> = [];
 
   const get = (k: K): ?V => {
-    const v = cache.get(k);
+    for (let i = 0; i < cache.length; i++) {
+      if (deepEqual(cache[i][0], k)) {
+        if (i + 1 === cache.length) {
+          // Refresh
+          const tmp = cache[cache.length - 1];
 
-    if (v) {
-      // Refresh
-      cache.delete(k);
-      cache.set(k, v);
+          cache[cache.length - 1] = cache[i];
+          cache[i] = tmp;
+        }
+
+        return cache[i][1];
+      }
     }
-
-    return v;
   };
 
   const dropKey = (k: K): void => {
-    cache.delete(k);
+    for (let i = 0; i < cache.length; i++) {
+      if (deepEqual(cache[i][0], k)) {
+        cache.splice(i, 1);
+
+        return;
+      }
+    }
   };
 
   const dropValue = (v: V): void => {
-    const entries = cache.entries();
-
-    for (;;) {
-      const e = entries.next();
-
-      if (e.done) {
-        return;
-      }
-
-      if (e.value[1] === v) {
-        cache.delete(e.value[0]);
-
-        return;
+    for (let i = 0; i < cache.length; i++) {
+      if (cache[i][1] === v) {
+        cache.splice(i, 1);
       }
     }
   };
 
   const set = (k: K, v: V): void => {
-    if (!cache.delete(k)) {
-      // No item was deleted, make space for the new one if necessary
-      if (cache.size >= size) {
-        const lastK = cache.keys().next().value;
+    for (let i = 0; i < cache.length; i++) {
+      if (deepEqual(cache[i][0], k)) {
+        cache.splice(i, 1);
 
-        if (lastK) {
-          cache.delete(lastK);
-        }
+        break;
       }
     }
 
-    cache.set(k, v);
+    cache.push([k, v]);
+
+    if (cache.length > size) {
+      // Drop first
+      cache.splice(0, 1);
+    }
   };
 
   return {
