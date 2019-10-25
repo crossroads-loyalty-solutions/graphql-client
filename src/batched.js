@@ -71,7 +71,7 @@ export const createClient = ({
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: $ReadOnly<P>,
+    variables: P,
     { rejectAnyError = false }: RejectOptions = {}
   ): Promise<GraphQLResult<R>> => {
     const p = (new Promise((resolve: Resolve<GraphQLResponse<R>>, reject: Reject): void => {

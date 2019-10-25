@@ -9,7 +9,7 @@ export type Client<-O> = {
   size: () => number,
   query: <P, R: {}>(
     query: Query<P, R>,
-    variables: $ReadOnly<P>,
+    variables: P,
     options?: $ReadOnly<O>
   ) => Promise<GraphQLResult<R>>,
   wait: () => Promise<void>,

@@ -43,7 +43,7 @@ export const createClient = (
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: $ReadOnly<P>,
+    variables: P,
     { rejectAnyError = false }: RejectOptions = {}
   ): Promise<GraphQLResult<R>> => {
     const req = fetch(endpoint, createInit({ query, variables: variables || undefined }))

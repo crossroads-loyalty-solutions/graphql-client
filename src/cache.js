@@ -113,7 +113,7 @@ export const createClient = <C: Client<any>>(
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: $ReadOnly<P>,
+    variables: P,
     options?: CachedOptions<TypeofClientOptions<C>>
   ): Promise<GraphQLResult<R>> => {
     if (!options || !options.cache) {
