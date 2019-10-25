@@ -4,6 +4,7 @@ import type {
   Client,
   GraphQLResult,
   Query,
+  RejectOptions,
 } from "./graphql";
 
 import { parseError, requestError } from "./error";
@@ -13,8 +14,8 @@ import { createPromiseTracker } from "./promise";
 export type Fetch = (input: string, init: RequestOptions) => Promise<Response>;
 
 export type Options = {
-  fetch: Fetch,
-  endpoint: string,
+  +fetch: Fetch,
+  +endpoint: string,
 };
 
 /**
@@ -37,13 +38,13 @@ export const handleResponse = <R>(res: Response): Promise<R> =>
 
 export const createClient = (
   { endpoint, fetch }: Options
-): Client<{ rejectAnyError?: boolean }> => {
+): Client<RejectOptions> => {
   const { add, size, wait } = createPromiseTracker();
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: P,
-    { rejectAnyError = false }: { rejectAnyError?: boolean } = {}
+    variables: $ReadOnly<P>,
+    { rejectAnyError = false }: RejectOptions = {}
   ): Promise<GraphQLResult<R>> => {
     const req = fetch(endpoint, createInit({ query, variables: variables || undefined }))
       .then(handleResponse)

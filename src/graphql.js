@@ -5,14 +5,25 @@ import { queryError } from "./error";
 /**
  * A GraphQLClient with the possible options O.
  */
-export type Client<O> = {
+export type Client<-O> = {
   size: () => number,
   query: <P, R: {}>(
     query: Query<P, R>,
-    variables: P,
-    options?: O
+    variables: $ReadOnly<P>,
+    options?: $ReadOnly<O>
   ) => Promise<GraphQLResult<R>>,
   wait: () => Promise<void>,
+};
+
+export type TypeofClientOptions<+C: Client<any>> =
+  $Call<<T, D: Client<T>>(D) => T, C>;
+
+export type RejectOptions = {
+  /**
+   * If set to true the client will throw on any error even if partial data
+   * exists, defaults to false.
+   */
+  +rejectAnyError?: boolean,
 };
 
 export type GraphQLError = {

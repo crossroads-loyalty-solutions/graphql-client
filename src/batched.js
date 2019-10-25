@@ -5,6 +5,7 @@ import type {
   GraphQLResponse,
   GraphQLResult,
   Query,
+  RejectOptions,
 } from "./graphql";
 import type { Fetch } from "./fetch";
 import type { Reject, Resolve } from "./promise";
@@ -35,7 +36,7 @@ export const createClient = ({
   fetch,
   endpoint,
   debounceTime = 5,
-}: Options): Client<{ rejectAnyError?: boolean }> => {
+}: Options): Client<RejectOptions> => {
   const { wait, add, size } = createPromiseTracker();
 
   let timer: ?TimeoutID = null;
@@ -70,8 +71,8 @@ export const createClient = ({
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: P,
-    { rejectAnyError = false }: { rejectAnyError?: boolean } = {}
+    variables: $ReadOnly<P>,
+    { rejectAnyError = false }: RejectOptions = {}
   ): Promise<GraphQLResult<R>> => {
     const p = (new Promise((resolve: Resolve<GraphQLResponse<R>>, reject: Reject): void => {
       if (!timer) {

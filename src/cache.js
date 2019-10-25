@@ -1,6 +1,13 @@
 /* @flow */
 
-import type { Client, GraphQLRequestBody, GraphQLResult, Query } from "./graphql";
+import type {
+  Client,
+  GraphQLClient,
+  GraphQLRequestBody,
+  GraphQLResult,
+  Query,
+  TypeofClientOptions,
+} from "./graphql";
 
 import deepEqual from "fast-deep-equal";
 
@@ -10,6 +17,15 @@ export type Cache<K, V> = {
   dropKey: (k: K) => void,
   dropValue: (v: V) => void,
 };
+
+export type CachedOptions<O> = O & {
+  /**
+   * If to use a cache for the query, defaults to false.
+   */
+  +cache?: boolean,
+};
+
+export type CachedClient<C: Client<any>> = Client<CachedOptions<TypeofClientOptions<C>>>;
 
 type CachedClientOptions = {
   size?: number,
@@ -85,18 +101,18 @@ export const createCache = <K, V>(size: number): Cache<K, V> => {
 /**
  * Creates an opt-in LRU-cache for all queries.
  */
-export const createClient = <O: {}>(
-  client: Client<O>,
+export const createClient = <C: Client<any>>(
+  client: C,
   { size: cacheSize = 10 }: CachedClientOptions = {}
-): Client<O & { cache?: boolean }> => {
-  const { query: parentQuery, wait, size } = client;
+): CachedClient<C> => {
+  const { query: parentQuery, wait, size } = (client: Client<TypeofClientOptions<C>>);
   const { dropValue, get, set } =
     createCache<GraphQLRequestBody, Promise<GraphQLResult<any>>>(cacheSize);
 
   const query = <P, R: {}>(
     query: Query<P, R>,
-    variables: P,
-    options?: O & { cache?: boolean }
+    variables: $ReadOnly<P>,
+    options?: CachedOptions<TypeofClientOptions<C>>
   ): Promise<GraphQLResult<R>> => {
     if (!options || !options.cache) {
       return parentQuery(query, variables, options);

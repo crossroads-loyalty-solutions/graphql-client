@@ -1,6 +1,12 @@
 /* @flow */
 
-export type { Client, GraphQLError, GraphQLResult, Query } from "./graphql";
+export type {
+  Client,
+  GraphQLError,
+  GraphQLResult,
+  Query,
+  TypeofClientOptions,
+} from "./graphql";
 export type { Fetch } from "./fetch";
 
 export { createClient as createFetchClient } from "./fetch";
