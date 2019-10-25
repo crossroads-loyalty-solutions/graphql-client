@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { GraphQLClient } from "../src";
+
 import ava from "ava";
 import ninos from "ninos";
 
@@ -25,6 +27,8 @@ test("single", async t => {
     fetch,
     endpoint: "foo",
   });
+
+  (client: GraphQLClient);
 
   t.is(client.size(), 0);
 

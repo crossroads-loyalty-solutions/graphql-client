@@ -27,6 +27,8 @@ export type CachedOptions<O> = O & {
 
 export type CachedClient<C: Client<any>> = Client<CachedOptions<TypeofClientOptions<C>>>;
 
+export type CachedGraphQLClient = CachedClient<GraphQLClient>;
+
 type CachedClientOptions = {
   size?: number,
 };

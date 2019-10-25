@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { CachedGraphQLClient, GraphQLClient } from "../src";
+
 import ava from "ava";
 import ninos from "ninos";
 
@@ -47,6 +49,10 @@ test("client", async t => {
   const query = t.context.stub(() => Promise.resolve(responses[i++]));
 
   const client = createClient({ wait, size, query }, { size: 2 });
+
+  // Type test
+  (client: CachedGraphQLClient);
+  (client: GraphQLClient);
 
   // Ensure forwarded
   t.is(client.wait, wait);

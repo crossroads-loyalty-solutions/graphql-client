@@ -26,6 +26,11 @@ export type RejectOptions = {
   +rejectAnyError?: boolean,
 };
 
+/**
+ * The most common type of client.
+ */
+export type GraphQLClient = Client<RejectOptions>;
+
 export type GraphQLError = {
   +message: string,
 };
