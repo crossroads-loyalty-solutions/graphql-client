@@ -6,12 +6,12 @@ export default {
   input: "src/index.js",
   output: [
     {
-      file: "dist/index.js",
+      dir: "dist/cjs",
       format: "cjs",
       sourcemap: true,
     },
     {
-      file: "dist/index.esm.js",
+      dir: "dist/esm",
       format: "esm",
       sourcemap: true,
     },
@@ -19,6 +19,7 @@ export default {
   plugins: [
     babel(require("./build/babel")),
   ],
+  preserveModules: true,
   external: [
     "fast-deep-equal",
   ],
