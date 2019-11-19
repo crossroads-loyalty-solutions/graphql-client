@@ -1,6 +1,6 @@
 {
   "name": "@crossroads-loyalty-solutions/graphql-client",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A more capable client for basic queries",
   "authors": [
     "Martin Wernstål <m4rw3r@gmail.com>"
