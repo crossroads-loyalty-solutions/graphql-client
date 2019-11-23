@@ -32,7 +32,7 @@
   "homepage": "https://github.com/crossroads-loyalty-solutions/graphql-client",
   "devDependencies": {
     "@babel/core": "7.7.4",
-    "@babel/plugin-syntax-flow": "7.7.0",
+    "@babel/plugin-syntax-flow": "7.7.4",
     "@babel/plugin-transform-flow-strip-types": "7.6.3",
     "@babel/preset-env": "7.7.1",
     "@babel/register": "7.7.0",
