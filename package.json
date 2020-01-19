@@ -37,7 +37,7 @@
     "@babel/preset-env": "7.7.6",
     "@babel/register": "7.7.4",
     "@crossroads-loyalty-solutions/eslint-config-xo": "0.2.8",
-    "ava": "2.4.0",
+    "ava": "3.0.0",
     "flow-bin": "0.114.0",
     "ninos": "3.0.0",
     "nodemon": "2.0.2",
