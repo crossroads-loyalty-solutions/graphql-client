@@ -1,6 +1,6 @@
 # GraphQL Client
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/crossroads-loyalty-solutions/graphql-client.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/awardit/graphql-client.svg)](https://greenkeeper.io/)
 
 A simple graphql-client library where queries are just typed strings and
 responses are just promises.
@@ -16,6 +16,6 @@ responses are just promises.
 ## Installation
 
 ```
-npm i @crossroads-loyalty-solutions/graphql-client
+npm i @awardit/graphql-client
 ```
 

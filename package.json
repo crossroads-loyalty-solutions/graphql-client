@@ -1,5 +1,5 @@
 {
-  "name": "@crossroads-loyalty-solutions/graphql-client",
+  "name": "@awardit/graphql-client",
   "version": "0.0.6",
   "description": "A more capable client for basic queries",
   "authors": [
@@ -26,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/crossroads-loyalty-solutions/graphql-client.git"
+    "url": "https://github.com/awardit/graphql-client.git"
   },
-  "bugs": "https://github.com/crossroads-loyalty-solutions/graphql-client/issues",
-  "homepage": "https://github.com/crossroads-loyalty-solutions/graphql-client",
+  "bugs": "https://github.com/awardit/graphql-client/issues",
+  "homepage": "https://github.com/awardit/graphql-client",
   "devDependencies": {
     "@ava/babel": "1.0.0",
     "@babel/core": "7.8.4",
