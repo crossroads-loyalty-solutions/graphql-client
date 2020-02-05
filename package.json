@@ -1,6 +1,6 @@
 {
   "name": "@awardit/graphql-client",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A more capable client for basic queries",
   "authors": [
     "Martin Wernstål <m4rw3r@gmail.com>"
